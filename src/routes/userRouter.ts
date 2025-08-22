@@ -11,18 +11,16 @@ router.post('/auth/register', authController.register);
 
 // Авторизация пользователя
 router.post('/auth/login', authController.login);
-router.use(accessMiddleware)
+ 
+// Получение списка пользователей (админ)
+router.get('/users', accessMiddleware, requireAdmin, userController.getAllUsers);
+
 // Получение пользователя по ID (админ или сам пользователь)
-router.get('/:id', requireSelfOrAdmin, userController.getUserById);
-
-// Получение списка пользователей (только для админа)
-router.get('/', requireAdmin, userController.getAllUsers);
-
+router.get('/:id', accessMiddleware, requireSelfOrAdmin, userController.getUserById);
 
 // Блокировка пользователя (админ или сам пользователь)
-router.patch('/:id/block', requireSelfOrAdmin, userController.blockUser);
-
-// Дополнительно: разблокировка пользователя (только админ)
+router.patch('/:id/block', accessMiddleware, requireSelfOrAdmin, userController.blockUser);
+// Разблокировка пользователя (админ)
 router.patch('/:id/unblock', accessMiddleware, requireAdmin, userController.unblockUser);
 
 export default router; 

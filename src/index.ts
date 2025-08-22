@@ -16,7 +16,7 @@ AppDataSource.initialize().then(async () => {
     };
     
     app.use(timeLog);
-    app.use('/users',userRouter)
+    app.use('/user',userRouter)
      
     app.use(errorHandler);
    app.listen(PORT, () => {

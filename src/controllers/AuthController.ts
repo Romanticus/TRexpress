@@ -117,6 +117,14 @@ export class AuthController {
         });
         return;
       }
+
+        if (user.isBlocked ) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          message: "Доступ заблокирован",
+        });
+        return;
+      }
+
       const tokens = await this.refresh(user);
 
       const { password, refreshToken, ...userWithoutPassword } = user;
