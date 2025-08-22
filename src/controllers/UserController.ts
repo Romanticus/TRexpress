@@ -65,6 +65,7 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
+        
       const { id } = req.params;
       const existingUser = await this.userRepository.findById(id);
       if (!existingUser) {
@@ -73,12 +74,37 @@ export class UserController {
         });
         return;
       }
-
-      // Блокируем пользователя
-      const updatedUser = await this.userRepository.updateUserStatus(id, false);
+      
+      const updatedUser = await this.userRepository.updateBlockUser(id, true);
 
       res.status(HttpStatus.OK).json({
         message: "Пользователь заблокирован",
+        user: updatedUser,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  unblockUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const user = await this.userRepository.findById(id);
+
+      if (!user) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          message: "Пользователь не найден",
+        });
+        return;
+      }
+
+      const updatedUser = await this.userRepository.updateBlockUser(id, false);
+
+      res.status(HttpStatus.OK).json({
+        message: "Пользователь разблокирован",
         user: updatedUser,
       });
     } catch (error) {

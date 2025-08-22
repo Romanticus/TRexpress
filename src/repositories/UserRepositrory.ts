@@ -41,6 +41,7 @@ export class UserRepository {
         "isActive",
         "createdAt",
         "updatedAt",
+        "isBlocked"
       ],
     });
   }
@@ -66,6 +67,7 @@ export class UserRepository {
         "isActive",
         "createdAt",
         "updatedAt",
+        "isBlocked"
       ],
     });
   }
@@ -98,6 +100,7 @@ export class UserRepository {
         "isActive",
         "createdAt",
         "updatedAt",
+        "isBlocked"
       ],
       skip,
       take: limit,
@@ -119,6 +122,11 @@ export class UserRepository {
 
   async updateUserStatus(id: string, isActive: boolean): Promise<UserWithoutPasswordAndToken | null> {
     await this.repository.update(id, { isActive });
+    return await this.findById(id);
+  }
+
+  async updateBlockUser(id: string, isBlocked: boolean): Promise<UserWithoutPasswordAndToken | null> {
+    await this.repository.update(id, { isBlocked });
     return await this.findById(id);
   }
 }

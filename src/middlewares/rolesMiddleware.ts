@@ -1,7 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatus } from '../utils/constants';
-import { JwtPayload } from '../utils/types';
+import { JwtPayload, UserRole } from '../utils/types';
 
 interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
@@ -18,7 +18,7 @@ export const requireAdmin = (
     });
   }
 
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== UserRole.ADMIN) {
     return res.status(HttpStatus.FORBIDDEN).json({
       message: 'Доступ запрещен. Требуются права администратора'
     });
@@ -41,7 +41,7 @@ export const requireSelfOrAdmin = (
 
   const userId = req.params.id;
   const isOwner = req.user.userId === userId;
-  const isAdmin = req.user.role === 'admin';
+  const isAdmin = req.user.role === UserRole.ADMIN;
 
   if (!isOwner && !isAdmin) {
     return res.status(HttpStatus.FORBIDDEN).json({
