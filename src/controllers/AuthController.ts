@@ -16,7 +16,7 @@ import { validate } from "class-validator";
 import { JwtPayload, UserRole } from "../utils/types";
 import { LoginDto } from "../dto/auth/LoginDto";
 import { User } from "../entities/User.entity";
-import { validateErrorHandler } from "../utils/validationhandler";
+import { validateErrorHandler } from "../utils/validationHandler";
 
 export class AuthController {
   private userRepository: UserRepository;

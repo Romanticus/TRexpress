@@ -4,7 +4,7 @@ import { UserRepository } from "../repositories/UserRepositrory";
 import { HttpStatus } from "../utils/constants";
 import { GetIDParamDto } from "../dto/user/GetIdParamDto";
 import { validate} from "class-validator";
-import { validateErrorHandler } from "../utils/validationhandler";
+import { validateErrorHandler } from "../utils/validationHandler";
 import { PaginationQueryDto } from "../dto/user/PaginationQueryDto";
 
 interface AuthenticatedRequest extends Request {
