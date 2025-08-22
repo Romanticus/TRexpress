@@ -11,7 +11,7 @@ import {
   JWT_ACCESS_EXPIRES_IN,
 } from "../utils/constants";
 import { v4 as uuidv4 } from "uuid";
-
+import { validate } from "class-validator";
 
 export class UserController {
   private userRepository: UserRepository;
@@ -19,8 +19,21 @@ export class UserController {
     this.userRepository = new UserRepository();
   }
 
+  register = async (req: Request, res: Response): Promise<void> => {
+    try{
+    const registerDto = Object.assign(new CreateUserDto(), req.body);
 
-  async register(registerDto: CreateUserDto) {
+    const errors = await validate(registerDto);
+    if (errors.length > 0) {
+      res.status(400).json({
+        message: "Validation failed",
+        errors: errors
+          .map((error) => Object.values(error.constraints || {}))
+          .flat(),
+      });
+      return;
+    }
+
     const hashedPassword = await bcrypt.hash(
       registerDto.password,
       BCRYPT_SALT_ROUNDS
@@ -42,12 +55,19 @@ export class UserController {
       id,
       refreshToken: hashedRefreshToken,
     });
-    return {
-      message: "Регистрация прошла успешно",
-      user: newUser,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-    };
+
+    const { password, ...newUserWithoutPassword } = newUser;
+
+      res.status(201).json({
+        message: "Регистрация прошла успешно",
+        user: newUserWithoutPassword,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      });
+    } catch (error) {
+      console.error('Ошибка при регистрации:', error);
+      res.status(500).json({ message: 'Внутренняя ошибка сервера' });
+    }
   }
 
   async _getTokens(user: { id: string; email: string; role?: string }) {
