@@ -13,7 +13,7 @@ import {
 } from "../utils/constants";
 import { v4 as uuidv4 } from "uuid";
 import { validate } from "class-validator";
-import { JwtPayload } from "../utils/types";
+import { JwtPayload, UserRole } from "../utils/types";
 import { LoginDto } from "../dto/LoginDto";
 import { User } from "../entities/User.entity";
 
@@ -150,8 +150,9 @@ export class AuthController {
     const payload: JwtPayload = {
       userId: user.id,
       email: user.email,
-      role: user.role || "user",
+      role: user.role || UserRole.USER,
     };
+    
 
     const accessToken = jwt.sign(payload, JWT_ACCESS_SECRET, {
       expiresIn: JWT_ACCESS_EXPIRES_IN,
