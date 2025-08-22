@@ -17,7 +17,7 @@ import { JwtPayload } from "../utils/types";
 import { LoginDto } from "../dto/LoginDto";
 import { User } from "../entities/User.entity";
 
-export class UserController {
+export class AuthController {
   private userRepository: UserRepository;
   constructor() {
     this.userRepository = new UserRepository();
@@ -170,4 +170,4 @@ export class UserController {
   }
 }
 
-export const userController = new UserController();
+export const authController = new AuthController();
