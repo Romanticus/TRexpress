@@ -10,5 +10,5 @@ export const AppDataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD || "1111",
   database: process.env.POSTGRES_DB || "TRexpress",
   synchronize: !!process.env.POSTGRES_SYNC ,
-  entities: [],
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 });

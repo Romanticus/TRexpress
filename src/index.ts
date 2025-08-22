@@ -1,6 +1,5 @@
-import * as express from "express"
+import  express from "express"
 import { AppDataSource } from "./config/data-source"
-import userRouter from "./routes/user"
 import { PORT } from "./utils/constants"
 
 AppDataSource.initialize().then(async () => {
@@ -10,6 +9,6 @@ AppDataSource.initialize().then(async () => {
     // app.use('/users',userRouter)
      
    app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Сервер запущен на порту: ${PORT}`);
   });
 }).catch(error => console.log(error))
