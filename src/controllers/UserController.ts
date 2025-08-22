@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserRepository } from "../repositories/UserRepositrory";
@@ -9,9 +9,12 @@ import {
   BCRYPT_SALT_ROUNDS,
   JWT_REFRESH_EXPIRES_IN,
   JWT_ACCESS_EXPIRES_IN,
+  HttpStatus,
 } from "../utils/constants";
 import { v4 as uuidv4 } from "uuid";
 import { validate } from "class-validator";
+import { QueryFailedError } from "typeorm";
+
 
 export class UserController {
   private userRepository: UserRepository;
@@ -58,17 +61,48 @@ export class UserController {
 
     const { password, ...newUserWithoutPassword } = newUser;
 
-      res.status(201).json({
+      res.status(HttpStatus.CREATED).json({
         message: "Регистрация прошла успешно",
         user: newUserWithoutPassword,
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       });
-    } catch (error) {
-      console.error('Ошибка при регистрации:', error);
-      res.status(500).json({ message: 'Внутренняя ошибка сервера' });
-    }
-  }
+    } catch (exception) {
+        if (
+      typeof exception === 'object' &&
+      exception !== null &&
+      'code' in exception &&
+      exception.code === '23505'
+    ) {
+      const driverError = (exception as unknown as QueryFailedError)
+        .driverError as {
+        detail?: string;
+        table?: string;
+      };
+
+      const detail = driverError?.detail ?? '';
+      const table = driverError?.table ?? 'Entity';
+      const match = detail.match(/\((.+?)\)=\((.+?)\)/);
+      const field = match?.[1];
+      const value = match?.[2];
+
+      const message =
+        field && value
+          ? `${table} с таким ${field} ${value} уже существует`
+          : `${table} с таким уникальным значением уже существует`;
+
+     res.status(HttpStatus.CONFLICT).json({
+        statusCode: HttpStatus.CONFLICT,
+        message,
+      });
+        return;
+      }
+      
+      
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        message: 'Внутренняя ошибка сервера' 
+      });
+  }}
 
   async _getTokens(user: { id: string; email: string; role?: string }) {
     const payload = {
