@@ -5,5 +5,5 @@ import { userController } from '../controllers/UserController';
 const router = Router(); 
 
 router.post('/auth/register', userController.register);
-
+router.post('/auth/login', userController.login);
 export default router; 

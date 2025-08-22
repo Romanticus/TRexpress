@@ -15,6 +15,8 @@ export interface UserListResponse {
   totalPages: number;
 }
 
+export type UserWithoutPasswordAndToken = Omit<User, "password" | "refreshToken">;
+
 export class UserRepository {
   private repository: Repository<User>;
 
@@ -27,7 +29,7 @@ export class UserRepository {
     return await this.repository.save(user);
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<UserWithoutPasswordAndToken | null> {
     return await this.repository.findOne({
       where: { id },
       select: [
@@ -52,7 +54,7 @@ export class UserRepository {
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<UserWithoutPasswordAndToken | null> {
     return await this.repository.findOne({
       where: { email },
       select: [
@@ -72,6 +74,14 @@ export class UserRepository {
     return await this.repository.findOne({
       where: { email },
     });
+  }
+
+  async updateUser(id: string, userUpdate: Partial<User>): Promise<UserWithoutPasswordAndToken | null> {
+    const user = await this.repository.findOneOrFail({ where: { id } });
+    const updatedUser = await this.repository.save({...user,...userUpdate});
+
+    const { password, refreshToken, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
   }
 
   async findAll(options: PaginationOptions = {}): Promise<UserListResponse> {
@@ -107,7 +117,7 @@ export class UserRepository {
     };
   }
 
-  async updateUserStatus(id: string, isActive: boolean): Promise<User | null> {
+  async updateUserStatus(id: string, isActive: boolean): Promise<UserWithoutPasswordAndToken | null> {
     await this.repository.update(id, { isActive });
     return await this.findById(id);
   }

@@ -14,6 +14,10 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { validate } from "class-validator";
 import { QueryFailedError } from "typeorm";
+import { JwtPayload } from "../utils/types";
+import { error } from "console";
+import { LoginDto } from "../dto/LoginDto";
+import { User } from "../entities/User.entity";
 
 
 export class UserController {
@@ -28,7 +32,7 @@ export class UserController {
 
     const errors = await validate(registerDto);
     if (errors.length > 0) {
-      res.status(400).json({
+      res.status(HttpStatus.BAD_REQUEST).json({
         message: "Validation failed",
         errors: errors
           .map((error) => Object.values(error.constraints || {}))
@@ -104,8 +108,80 @@ export class UserController {
       });
   }}
 
+    login = async (req: Request, res: Response): Promise<void> => {
+    try{
+         const loginDto:LoginDto = Object.assign(new LoginDto(), req.body);
+
+    const errors = await validate(loginDto);
+    if (errors.length > 0) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        message: "Validation failed",
+        errors: errors
+          .map((error) => Object.values(error.constraints || {}))
+          .flat(),
+      });
+      return;
+    }
+
+    const user = await this.userRepository.findByEmailWithPassword(loginDto.email);
+    if (!user) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          message: "Пользователь не найден",
+        });
+        return;
+      }
+
+    const passwordMatch = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+    
+    if (!passwordMatch) {
+        res.status(HttpStatus.UNAUTHORIZED).json({
+          message: "Неверный email или пароль",
+        });
+        return;
+    }
+    const tokens = await this.refresh(user)
+
+
+    const { password, refreshToken, ...userWithoutPassword } = user;
+    
+    res.status(HttpStatus.OK).json({
+      message: "Авторизация успешна",
+      user: userWithoutPassword,
+      ...tokens
+    });
+
+
+
+    }
+    catch{ (error)
+
+    }
+    
+    
+    }
+
+  refresh = async (user:User ): Promise<any> => {
+    const tokens = await this._getTokens(user);
+    const hashedRefreshToken = await bcrypt.hash(
+      tokens.refreshToken,
+      BCRYPT_SALT_ROUNDS,
+    );
+    const updatedUser = await this.userRepository.updateUser(
+      user.id,
+      {refreshToken: hashedRefreshToken }
+    );
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: hashedRefreshToken,
+      
+    };
+  }
+
   async _getTokens(user: { id: string; email: string; role?: string }) {
-    const payload = {
+    const payload: JwtPayload = {
       userId: user.id,
       email: user.email,
       role: user.role || "user",
