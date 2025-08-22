@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserRepository } from "../repositories/UserRepositrory";
-import { CreateUserDto } from "../dto/CreateUserDto";
+import { CreateUserDto } from "../dto/auth/CreateUserDto";
 import {
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
@@ -14,8 +14,9 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { validate } from "class-validator";
 import { JwtPayload, UserRole } from "../utils/types";
-import { LoginDto } from "../dto/LoginDto";
+import { LoginDto } from "../dto/auth/LoginDto";
 import { User } from "../entities/User.entity";
+import { validateErrorHandler } from "../utils/validationhandler";
 
 export class AuthController {
   private userRepository: UserRepository;
@@ -32,15 +33,7 @@ export class AuthController {
       const registerDto = Object.assign(new CreateUserDto(), req.body);
 
       const errors = await validate(registerDto);
-      if (errors.length > 0) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-          message: "Ошибка валидации",
-          errors: errors
-            .map((error) => Object.values(error.constraints || {}))
-            .flat(),
-        });
-        return;
-      }
+      if (errors.length > 0) {return validateErrorHandler(res,errors)}
 
       const hashedPassword = await bcrypt.hash(
         registerDto.password,
@@ -86,15 +79,7 @@ export class AuthController {
       const loginDto: LoginDto = Object.assign(new LoginDto(), req.body);
 
       const errors = await validate(loginDto);
-      if (errors.length > 0) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-          message: "Validation failed",
-          errors: errors
-            .map((error) => Object.values(error.constraints || {}))
-            .flat(),
-        });
-        return;
-      }
+      if (errors.length > 0) { return validateErrorHandler(res,errors)}
 
       const user = await this.userRepository.findByEmailWithPassword(
         loginDto.email
