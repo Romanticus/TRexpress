@@ -6,7 +6,7 @@ export class CreateUserDto {
   fullName: string;
 
   @IsDateString()
-  birthDate: string;
+  birthDate: Date;
 
   @IsEmail()
   email: string;
