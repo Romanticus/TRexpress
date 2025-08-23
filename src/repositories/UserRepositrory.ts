@@ -15,7 +15,10 @@ export interface UserListResponse {
   totalPages: number;
 }
 
-export type UserWithoutPasswordAndToken = Omit<User, "password" | "refreshToken">;
+export type UserWithoutPasswordAndToken = Omit<
+  User,
+  "password" | "refreshToken"
+>;
 
 export class UserRepository {
   private repository: Repository<User>;
@@ -41,7 +44,7 @@ export class UserRepository {
         "isActive",
         "createdAt",
         "updatedAt",
-        "isBlocked"
+        "isBlocked",
       ],
     });
   }
@@ -55,7 +58,9 @@ export class UserRepository {
     });
   }
 
-  async findByEmail(email: string): Promise<UserWithoutPasswordAndToken | null> {
+  async findByEmail(
+    email: string
+  ): Promise<UserWithoutPasswordAndToken | null> {
     return await this.repository.findOne({
       where: { email },
       select: [
@@ -67,7 +72,7 @@ export class UserRepository {
         "isActive",
         "createdAt",
         "updatedAt",
-        "isBlocked"
+        "isBlocked",
       ],
     });
   }
@@ -78,9 +83,12 @@ export class UserRepository {
     });
   }
 
-  async updateUser(id: string, userUpdate: Partial<User>): Promise<UserWithoutPasswordAndToken | null> {
+  async updateUser(
+    id: string,
+    userUpdate: Partial<User>
+  ): Promise<UserWithoutPasswordAndToken | null> {
     const user = await this.repository.findOneOrFail({ where: { id } });
-    const updatedUser = await this.repository.save({...user,...userUpdate});
+    const updatedUser = await this.repository.save({ ...user, ...userUpdate });
 
     const { password, refreshToken, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
@@ -100,7 +108,7 @@ export class UserRepository {
         "isActive",
         "createdAt",
         "updatedAt",
-        "isBlocked"
+        "isBlocked",
       ],
       skip,
       take: limit,
@@ -120,12 +128,18 @@ export class UserRepository {
     };
   }
 
-  async updateUserStatus(id: string, isActive: boolean): Promise<UserWithoutPasswordAndToken | null> {
+  async updateUserStatus(
+    id: string,
+    isActive: boolean
+  ): Promise<UserWithoutPasswordAndToken | null> {
     await this.repository.update(id, { isActive });
     return await this.findById(id);
   }
 
-  async updateBlockUser(id: string, isBlocked: boolean): Promise<UserWithoutPasswordAndToken | null> {
+  async updateBlockUser(
+    id: string,
+    isBlocked: boolean
+  ): Promise<UserWithoutPasswordAndToken | null> {
     await this.repository.update(id, { isBlocked });
     return await this.findById(id);
   }

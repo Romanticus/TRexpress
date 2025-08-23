@@ -3,7 +3,7 @@ import { JwtPayload } from "../utils/types";
 import { UserRepository } from "../repositories/UserRepositrory";
 import { HttpStatus } from "../utils/constants";
 import { GetIDParamDto } from "../dto/user/GetIdParamDto";
-import { validate} from "class-validator";
+import { validate } from "class-validator";
 import { validateErrorHandler } from "../utils/validationHandler";
 import { PaginationQueryDto } from "../dto/user/PaginationQueryDto";
 

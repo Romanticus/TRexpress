@@ -32,7 +32,7 @@ export default function accessMiddleware(
   }
 
   const token = extractBearerToken(authorization);
-  let payload:JwtPayload;
+  let payload: JwtPayload;
 
   try {
     payload = jwt.verify(token, JWT_ACCESS_SECRET) as JwtPayload;

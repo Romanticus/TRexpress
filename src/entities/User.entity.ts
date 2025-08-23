@@ -1,32 +1,36 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { UserRole } from "../utils/types";
 
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { UserRole } from '../utils/types';
-
-
-@Entity('users')
+@Entity("users")
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: "varchar", length: 255 })
   fullName: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: "date" })
   birthDate: Date;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: "varchar", unique: true })
   email: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: "varchar" })
   password: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
   role: UserRole;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: "boolean", default: true })
   isActive: boolean;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: "boolean", default: false })
   isBlocked: boolean;
 
   @CreateDateColumn()
@@ -36,7 +40,7 @@ export class User {
   updatedAt: Date;
 
   @Column({
-    type: 'varchar',
+    type: "varchar",
     length: 255,
     nullable: true,
     default: null,

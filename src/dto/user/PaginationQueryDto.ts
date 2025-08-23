@@ -1,6 +1,5 @@
 // src/dto/PaginationQueryDto.ts
-import { IsOptional, IsNumberString, Min } from 'class-validator';
-
+import { IsOptional, IsNumberString, Min } from "class-validator";
 
 export class PaginationQueryDto {
   @IsOptional()

@@ -33,7 +33,9 @@ export class AuthController {
       const registerDto = Object.assign(new CreateUserDto(), req.body);
 
       const errors = await validate(registerDto);
-      if (errors.length > 0) {return validateErrorHandler(res,errors)}
+      if (errors.length > 0) {
+        return validateErrorHandler(res, errors);
+      }
 
       const hashedPassword = await bcrypt.hash(
         registerDto.password,
@@ -62,8 +64,7 @@ export class AuthController {
       res.status(HttpStatus.CREATED).json({
         message: "Регистрация прошла успешно",
         user: newUserWithoutPassword,
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
+        ...tokens,
       });
     } catch (err) {
       return next(err);
@@ -79,7 +80,9 @@ export class AuthController {
       const loginDto: LoginDto = Object.assign(new LoginDto(), req.body);
 
       const errors = await validate(loginDto);
-      if (errors.length > 0) { return validateErrorHandler(res,errors)}
+      if (errors.length > 0) {
+        return validateErrorHandler(res, errors);
+      }
 
       const user = await this.userRepository.findByEmailWithPassword(
         loginDto.email
@@ -103,7 +106,7 @@ export class AuthController {
         return;
       }
 
-        if (user.isBlocked ) {
+      if (user.isBlocked) {
         res.status(HttpStatus.FORBIDDEN).json({
           message: "Доступ заблокирован",
         });
@@ -145,7 +148,6 @@ export class AuthController {
       email: user.email,
       role: user.role || UserRole.USER,
     };
-    
 
     const accessToken = jwt.sign(payload, JWT_ACCESS_SECRET, {
       expiresIn: JWT_ACCESS_EXPIRES_IN,

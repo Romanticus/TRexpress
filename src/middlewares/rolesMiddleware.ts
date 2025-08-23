@@ -1,7 +1,6 @@
-
-import { Request, Response, NextFunction } from 'express';
-import { HttpStatus } from '../utils/constants';
-import { JwtPayload, UserRole } from '../utils/types';
+import { Request, Response, NextFunction } from "express";
+import { HttpStatus } from "../utils/constants";
+import { JwtPayload, UserRole } from "../utils/types";
 
 interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
@@ -14,19 +13,18 @@ export const requireAdmin = (
 ) => {
   if (!req.user) {
     return res.status(HttpStatus.UNAUTHORIZED).json({
-      message: 'Необходима авторизация'
+      message: "Необходима авторизация",
     });
   }
 
   if (req.user.role !== UserRole.ADMIN) {
     return res.status(HttpStatus.FORBIDDEN).json({
-      message: 'Доступ запрещен. Требуются права администратора'
+      message: "Доступ запрещен. Требуются права администратора",
     });
   }
 
   next();
 };
-
 
 export const requireSelfOrAdmin = (
   req: AuthenticatedRequest,
@@ -35,7 +33,7 @@ export const requireSelfOrAdmin = (
 ) => {
   if (!req.user) {
     return res.status(HttpStatus.UNAUTHORIZED).json({
-      message: 'Необходима авторизация'
+      message: "Необходима авторизация",
     });
   }
 
@@ -45,7 +43,8 @@ export const requireSelfOrAdmin = (
 
   if (!isOwner && !isAdmin) {
     return res.status(HttpStatus.FORBIDDEN).json({
-      message: 'Доступ запрещен. Вы можете получить доступ только к своим данным'
+      message:
+        "Доступ запрещен. Вы можете получить доступ только к своим данным",
     });
   }
 
